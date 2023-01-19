@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Image } from 'react-native';
 import Botao from '../../componentes/Botao';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
 import { logar } from '../../Services/requisicoesFirebase';
 import estilos from './estilos';
 import { Alerta } from '../../componentes/Alerta';
+import { auth } from '../../config/firebase';
+
+import animacaoCarregando from '../../../assets/animacaoCarregando.gif'
+
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [statusError, setStatusError] = useState('')
   const [mensagemError, setMensagemError] = useState('')
+
+  // Verificar se esta sendo feita a autenticação
+  const [carregando, setCarregando] = useState(true)
+
+  //Verificar se o usuario ja logou
+  useEffect(() => {
+    const estadoUsuario = auth.onAuthStateChanged( usuario => {
+      if(usuario){
+        navigation.replace('Principal')
+      }
+      setCarregando(false)
+    })
+
+    return () => estadoUsuario()
+  },[])
 
   async function realizarLogin() {
     if(email == ''){
@@ -25,9 +44,19 @@ export default function Login({ navigation }) {
         setStatusError('firebase')
         setMensagemError('Email ou Senha não conferem')
       }else {
-        navigation.navigate('Principal')
+        navigation.replace('Principal')
       }
     } 
+  }
+
+  if(carregando) {
+    return (
+      <View style={estilos.containerAnimacao}>
+        <Image source={animacaoCarregando}
+          style={estilos.imagem}
+        />
+      </View>
+    )
   }
 
   return (
