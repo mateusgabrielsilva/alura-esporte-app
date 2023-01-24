@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import Botao from '../../componentes/Botao';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
 import estilos from './estilos';
@@ -8,6 +8,7 @@ import { Alerta } from '../../componentes/Alerta';
 
 
 export default function Cadastro({ navigation }) {  
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
@@ -15,7 +16,10 @@ export default function Cadastro({ navigation }) {
   const [mensagemError, setMensagemError] = useState('')
 
   async function realizarCadastro() {
-    if(email == ''){
+    if(nome == ''){
+      setMensagemError('Preencha com seu nome')
+      setStatusError('nome')
+    }else if(email == ''){
       setMensagemError('Preencha com seu email')
       setStatusError('email')
     }else if(senha == ''){
@@ -28,7 +32,7 @@ export default function Cadastro({ navigation }) {
       setMensagemError('As senhas não conferem')
       setStatusError('confirmaSenha')
     }else {
-      const resultado = await cadastrar(email, senha)
+      const resultado = await cadastrar(nome, email, senha)
       setStatusError('firebase')
       if(resultado == 'sucesso') {
         setMensagemError('Usuario criado com sucesso!')
@@ -46,6 +50,13 @@ export default function Cadastro({ navigation }) {
 
   return (
     <View style={estilos.container}>
+      <EntradaTexto 
+        label="Nome"
+        value={nome}
+        onChangeText={texto => setNome(texto)}
+        error={statusError == 'nome'}
+        messageError={mensagemError}
+      />
       <EntradaTexto 
         label="E-mail"
         value={email}
